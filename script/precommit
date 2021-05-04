@@ -29,7 +29,7 @@ run_golint() {
 }
 
 run_govet() {
-    GOVET_ERRORS=$(go tool vet ./*.go 2>&1)
+    GOVET_ERRORS=$(go vet ./*.go)
     if [ -n "$GOVET_ERRORS" ]
     then
         log_error "go vet failed for the following reasons: $GOVET_ERRORS please run 'go vet ./*.go' on your changes before committing."
@@ -37,4 +37,4 @@ run_govet() {
     fi
 }
 
-go tool vet
+master

@@ -1,5 +1,5 @@
 # Swolf
-[![Travis](https://travis-ci.org/aoyako/swolf.svg?branch=master)](https://travis-ci.org/aoyako/swolf)
+[![Travis](https://travis-ci.org/noyako/swolf.svg?branch=master)](https://travis-ci.org/noyako/swolf)
 
 * [Overview](#overview)
 * [Contributing](#contributing)
