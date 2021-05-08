@@ -3,6 +3,7 @@ package swolf
 type FMapper struct {
 	IDToField       func(string) string
 	FieldToDatabase func(string) string
+	KeyToValue      func(string) string
 }
 
 func (fm *FMapper) defaultArgs() {
@@ -13,6 +14,10 @@ func (fm *FMapper) defaultArgs() {
 	if fm.FieldToDatabase == nil {
 		fm.FieldToDatabase = defaultFieldToDatabase
 	}
+
+	if fm.KeyToValue == nil {
+		fm.KeyToValue = defaultKeyToValue
+	}
 }
 
 func defaultIDToFIledFunction(id string) string {
@@ -20,5 +25,9 @@ func defaultIDToFIledFunction(id string) string {
 }
 
 func defaultFieldToDatabase(field string) string {
+	return field
+}
+
+func defaultKeyToValue(field string) string {
 	return field
 }

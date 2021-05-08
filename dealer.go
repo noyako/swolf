@@ -1,6 +1,10 @@
 package swolf
 
-import "database/sql"
+import (
+	"database/sql"
+
+	_ "github.com/lib/pq"
+)
 
 type Dealer struct {
 	masterController *masterDB
@@ -14,7 +18,7 @@ func Setup(cfg Config) *Dealer {
 	}
 
 	var master *sql.DB
-	switch cfg.Connection {
+	switch cfg.Driver {
 	case "postgres":
 		master, err = sql.Open(cfg.Driver, cfg.Connection+" dbname="+cfg.MasterDatabase)
 	case "mysql":
@@ -23,6 +27,8 @@ func Setup(cfg Config) *Dealer {
 	if err != nil {
 		panic("Cannot open master database")
 	}
+
+	cfg.Mapper.defaultArgs()
 
 	var dealer Dealer
 	dealer.masterController = newMasterDB(master,
@@ -33,4 +39,8 @@ func Setup(cfg Config) *Dealer {
 	dealer.tenantController = newTenantDB(global, cfg.Connection, cfg.Template)
 
 	return &dealer
+}
+
+func (d *Dealer) Create(id string) (string, error) {
+	return d.masterController.Create(id)
 }
