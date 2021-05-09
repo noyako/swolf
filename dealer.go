@@ -44,3 +44,7 @@ func Setup(cfg Config) *Dealer {
 func (d *Dealer) Create(id string) (string, error) {
 	return d.masterController.Create(id)
 }
+
+func (d *Dealer) Get(id string) (string, error) {
+	return d.masterController.Get(id)
+}

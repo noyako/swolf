@@ -3,6 +3,8 @@ package swolf
 import (
 	"database/sql"
 	"fmt"
+
+	"github.com/aoyako/swolf/builder"
 )
 
 type masterDB struct {
@@ -33,7 +35,12 @@ func (m *masterDB) Get(id string) (string, error) {
 	defer t.Commit()
 
 	key := m.mapper.IDToField(id)
-	rows, err := t.Query("SELECT $1 FROM $2 WHERE $3=$4", m.tenantColumn, m.tableName, m.keyColumn, key)
+	builder := builder.NewBuilder().
+		Select(m.tenantColumn).
+		From(m.tableName).
+		Where(builder.Eq(m.keyColumn, "$1")).
+		Build()
+	rows, err := t.Query(builder, key)
 
 	if err != nil {
 		return "", err
@@ -69,15 +76,18 @@ func (m *masterDB) Create(id string) (string, error) {
 	}
 	defer t.Commit()
 
-	// stmt, err := t.Prepare("INSERT INTO $1($2, $3) VALUES($4, $5)")
-	stmt, err := t.Prepare("INSERT INTO main_table(tenant_id, tenant_db) VALUES($1, $2)")
+	req := builder.NewBuilder().
+		Insert(m.tableName, m.keyColumn, m.tenantColumn).
+		Values("$1", "$2").
+		Build()
+
+	stmt, err := t.Prepare(req)
 	if err != nil {
 		return "", err
 	}
 
 	key := m.mapper.IDToField(id)
 	value := m.mapper.KeyToValue(key)
-	// res, err := stmt.Exec(m.tableName, m.keyColumn, m.tenantColumn, key, value)
 	res, err := stmt.Exec(key, value)
 	if err != nil {
 		return "", err
@@ -101,13 +111,18 @@ func (m *masterDB) Delete(id string) error {
 	}
 	defer t.Commit()
 
-	stmt, err := t.Prepare("DELETE FROM $1 WHERE $2=$3")
+	req := builder.NewBuilder().
+		Delete(m.tableName).
+		Where(builder.Eq(m.keyColumn, "$1")).
+		Build()
+
+	stmt, err := t.Prepare(req)
 	if err != nil {
 		return err
 	}
 
 	key := m.mapper.IDToField(id)
-	res, err := stmt.Exec(m.tableName, key)
+	res, err := stmt.Exec(key)
 	if err != nil {
 		return err
 	}

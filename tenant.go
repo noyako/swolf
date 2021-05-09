@@ -17,3 +17,18 @@ func newTenantDB(db *sql.DB, connection, tmpl string) *tenantDB {
 		template: tmpl,
 	}
 }
+
+func (t *tenantDB) Get(name string) (*sql.DB, error) {
+	// TODO
+	return nil, nil
+}
+
+func (t *tenantDB) Create(name string) (*sql.DB, error) {
+	// TODO
+	return nil, nil
+}
+
+func (t *tenantDB) Delete(name string) error {
+	// TODO
+	return nil
+}

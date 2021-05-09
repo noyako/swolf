@@ -10,23 +10,6 @@ type SQLBuilder struct {
 	builder strings.Builder
 }
 
-type Eq struct {
-	Key   string
-	Value string
-}
-
-type Op struct {
-	Operation string
-}
-
-func (e Eq) Build() string {
-	return e.Key + "=" + e.Value + " "
-}
-
-func (o Op) Build() string {
-	return o.Operation + " "
-}
-
 func (b *SQLBuilder) Select(what ...string) *SQLBuilder {
 	b.builder.WriteString("SELECT ")
 
@@ -57,4 +40,47 @@ func (b *SQLBuilder) Where(args ...Arg) *SQLBuilder {
 	}
 
 	return b
+}
+
+func (b *SQLBuilder) Insert(table string, what ...string) *SQLBuilder {
+	b.builder.WriteString("INSERT INTO ")
+	b.builder.WriteString(table)
+	b.builder.WriteString("(")
+
+	for i := 0; i < len(what)-1; i++ {
+		b.builder.WriteString(what[i])
+		b.builder.WriteString(", ")
+	}
+	b.builder.WriteString(what[len(what)-1])
+	b.builder.WriteString(") ")
+
+	return b
+}
+
+func (b *SQLBuilder) Values(args ...string) *SQLBuilder {
+	b.builder.WriteString("VALUES (")
+
+	for i := 0; i < len(args)-1; i++ {
+		b.builder.WriteString(args[i])
+		b.builder.WriteString(", ")
+	}
+	b.builder.WriteString(args[len(args)-1])
+	b.builder.WriteString(") ")
+
+	return b
+}
+
+func (b *SQLBuilder) Delete(table string) *SQLBuilder {
+	b.builder.WriteString("DELETE FROM ")
+	b.builder.WriteString(table)
+
+	return b
+}
+
+func (b *SQLBuilder) Build() string {
+	return b.builder.String()
+}
+
+func NewBuilder() *SQLBuilder {
+	return &SQLBuilder{}
 }

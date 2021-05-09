@@ -17,6 +17,6 @@ func main() {
 		MasterData:     swolf.MasterFieldResolver("tenant_id", "tenant_db"),
 	})
 
-	value, err := d.Create("poggers")
+	value, err := d.Get("poggers")
 	fmt.Println(value, err)
 }
