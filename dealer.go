@@ -8,8 +8,8 @@ import (
 )
 
 type Dealer struct {
-	masterController *masterDB
-	tenantController *tenantDB
+	masterController masterController
+	tenantController tenantController
 }
 
 func Setup(cfg Config) *Dealer {
