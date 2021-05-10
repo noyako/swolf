@@ -17,7 +17,11 @@ func (b *SQLBuilder) Select(what ...string) *SQLBuilder {
 		b.builder.WriteString(what[i])
 		b.builder.WriteString(", ")
 	}
-	b.builder.WriteString(what[len(what)-1])
+	if len(what) == 0 {
+		b.builder.WriteString("*")
+	} else {
+		b.builder.WriteString(what[len(what)-1])
+	}
 	b.builder.WriteString(" ")
 
 	return b
@@ -51,7 +55,10 @@ func (b *SQLBuilder) Insert(table string, what ...string) *SQLBuilder {
 		b.builder.WriteString(what[i])
 		b.builder.WriteString(", ")
 	}
-	b.builder.WriteString(what[len(what)-1])
+	if len(what) != 0 {
+		b.builder.WriteString(what[len(what)-1])
+	}
+
 	b.builder.WriteString(") ")
 
 	return b
@@ -64,16 +71,16 @@ func (b *SQLBuilder) Values(args ...string) *SQLBuilder {
 		b.builder.WriteString(args[i])
 		b.builder.WriteString(", ")
 	}
-	b.builder.WriteString(args[len(args)-1])
+	if len(args) != 0 {
+		b.builder.WriteString(args[len(args)-1])
+	}
 	b.builder.WriteString(") ")
 
 	return b
 }
 
-func (b *SQLBuilder) Delete(table string) *SQLBuilder {
-	b.builder.WriteString("DELETE FROM ")
-	b.builder.WriteString(table)
-	b.builder.WriteString(" ")
+func (b *SQLBuilder) Delete() *SQLBuilder {
+	b.builder.WriteString("DELETE ")
 
 	return b
 }

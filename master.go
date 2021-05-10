@@ -112,7 +112,8 @@ func (m *masterDB) Delete(id string) (string, error) {
 	defer t.Commit()
 
 	req := builder.NewBuilder().
-		Delete(m.tableName).
+		Delete().
+		From(m.tableName).
 		Where(builder.Eq(m.keyColumn, "$1")).
 		Build()
 
