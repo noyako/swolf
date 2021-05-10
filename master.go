@@ -104,10 +104,10 @@ func (m *masterDB) Create(id string) (string, error) {
 	return m.mapper.FieldToDatabase(value), nil
 }
 
-func (m *masterDB) Delete(id string) error {
+func (m *masterDB) Delete(id string) (string, error) {
 	t, err := m.db.Begin()
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer t.Commit()
 
@@ -118,22 +118,23 @@ func (m *masterDB) Delete(id string) error {
 
 	stmt, err := t.Prepare(req)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	key := m.mapper.IDToField(id)
+	value := m.mapper.FieldToDatabase(key)
 	res, err := stmt.Exec(key)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	rowCnt, err := res.RowsAffected()
 	if err != nil {
-		return err
+		return "", err
 	}
 	if rowCnt == 0 {
-		return fmt.Errorf("Could not delete for id=%s (key=%s)", id, key)
+		return "", fmt.Errorf("Could not delete for id=%s (key=%s)", id, key)
 	}
 
-	return nil
+	return value, nil
 }

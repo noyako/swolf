@@ -3,6 +3,7 @@ package swolf
 import (
 	"database/sql"
 
+	"github.com/aoyako/swolf/connector"
 	_ "github.com/lib/pq"
 )
 
@@ -17,13 +18,7 @@ func Setup(cfg Config) *Dealer {
 		panic("Cannot open sql environment")
 	}
 
-	var master *sql.DB
-	switch cfg.Driver {
-	case "postgres":
-		master, err = sql.Open(cfg.Driver, cfg.Connection+" dbname="+cfg.MasterDatabase)
-	case "mysql":
-		master, err = sql.Open(cfg.Driver, cfg.Connection+"/"+cfg.MasterDatabase)
-	}
+	master, err := connector.Connect(cfg.Driver, cfg.Connection, cfg.MasterDatabase)
 	if err != nil {
 		panic("Cannot open master database")
 	}
@@ -36,15 +31,31 @@ func Setup(cfg Config) *Dealer {
 		cfg.MasterData.getTenant(),
 		cfg.Mapper)
 
-	dealer.tenantController = newTenantDB(global, cfg.Connection, cfg.Template)
+	dealer.tenantController = newTenantDB(global, cfg.Connection, cfg.Driver, cfg.Template)
 
 	return &dealer
 }
 
-func (d *Dealer) Create(id string) (string, error) {
-	return d.masterController.Create(id)
+func (d *Dealer) Create(id string) (*sql.DB, error) {
+	name, err := d.masterController.Create(id)
+	if err != nil {
+		return nil, err
+	}
+	return d.tenantController.Create(name)
 }
 
-func (d *Dealer) Get(id string) (string, error) {
-	return d.masterController.Get(id)
+func (d *Dealer) Get(id string) (*sql.DB, error) {
+	name, err := d.masterController.Get(id)
+	if err != nil {
+		return nil, err
+	}
+	return d.tenantController.Get(name)
+}
+
+func (d *Dealer) Delete(id string) error {
+	name, err := d.masterController.Delete(id)
+	if err != nil {
+		return err
+	}
+	return d.tenantController.Delete(name)
 }

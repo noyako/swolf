@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-	// fmt.Println("Hello, world!")
 	d := swolf.Setup(swolf.Config{
 		Driver: "postgres",
 		Connection: "host=localhost user=postgres " +
@@ -17,6 +16,6 @@ func main() {
 		MasterData:     swolf.MasterFieldResolver("tenant_id", "tenant_db"),
 	})
 
-	value, err := d.Get("poggers")
-	fmt.Println(value, err)
+	db, err := d.Create("poggers1")
+	fmt.Println(db, err)
 }

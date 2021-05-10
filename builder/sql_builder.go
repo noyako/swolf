@@ -73,6 +73,31 @@ func (b *SQLBuilder) Values(args ...string) *SQLBuilder {
 func (b *SQLBuilder) Delete(table string) *SQLBuilder {
 	b.builder.WriteString("DELETE FROM ")
 	b.builder.WriteString(table)
+	b.builder.WriteString(" ")
+
+	return b
+}
+
+func (b *SQLBuilder) Create(dbname string) *SQLBuilder {
+	b.builder.WriteString("CREATE DATABASE ")
+	b.builder.WriteString(dbname)
+	b.builder.WriteString(" ")
+
+	return b
+}
+
+func (b *SQLBuilder) Template(template string) *SQLBuilder {
+	b.builder.WriteString("TEMPLATE ")
+	b.builder.WriteString(template)
+	b.builder.WriteString(" ")
+
+	return b
+}
+
+func (b *SQLBuilder) Drop(dbname string) *SQLBuilder {
+	b.builder.WriteString("DROP DATABASE ")
+	b.builder.WriteString(dbname)
+	b.builder.WriteString(" ")
 
 	return b
 }
