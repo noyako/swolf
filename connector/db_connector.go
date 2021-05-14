@@ -2,6 +2,7 @@ package connector
 
 import "database/sql"
 
+// Connect to database with diven name and credentials as connection variable
 func Connect(driver, connection, database string) (*sql.DB, error) {
 	var db *sql.DB
 	var err error
