@@ -1,5 +1,17 @@
 package swolf
 
+import (
+	"fmt"
+	"reflect"
+	"strings"
+)
+
+const (
+	tagName  = "sw"
+	tagKey   = "key"
+	tagValue = "tenant"
+)
+
 // Config for database manager.
 type Config struct {
 	Driver         string
@@ -45,13 +57,49 @@ func MasterDataResolver(in interface{}) MasterResolver {
 }
 
 func (mdr *masterDataResolver) getKey() string {
-	// TODO
-	return ""
+	t := reflect.TypeOf(mdr.data).Elem()
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		tag := field.Tag.Get(tagName)
+		if tag != "" {
+			pairs := strings.Split(tag, ",")
+			if len(pairs) != 2 {
+				panic(fmt.Sprintf(panicTagInWrongFormat, tag))
+			}
+
+			if pairs[0] == tagKey {
+				return pairs[1]
+			} else if pairs[0] == tagValue {
+			} else {
+				panic(fmt.Sprintf(panicTagInWrongFormat, tag))
+			}
+		}
+		fmt.Printf("%d. %v (%v), tag: '%v'\n", i+1, field.Name, field.Type.Name(), tag)
+	}
+	panic(panicTagNotFound)
 }
 
 func (mdr *masterDataResolver) getTenant() string {
-	// TODO
-	return ""
+	t := reflect.TypeOf(mdr.data).Elem()
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		tag := field.Tag.Get(tagName)
+		if tag != "" {
+			pairs := strings.Split(tag, ",")
+			if len(pairs) != 2 {
+				panic(fmt.Sprintf(panicTagInWrongFormat, tag))
+			}
+
+			if pairs[0] == tagKey {
+			} else if pairs[0] == tagValue {
+				return pairs[1]
+			} else {
+				panic(fmt.Sprintf(panicTagInWrongFormat, tag))
+			}
+		}
+		fmt.Printf("%d. %v (%v), tag: '%v'\n", i+1, field.Name, field.Type.Name(), tag)
+	}
+	panic(panicTagNotFound)
 }
 
 func (mfr *masterFieldResolver) getKey() string {

@@ -3,15 +3,16 @@ package swolf
 import (
 	"database/sql"
 
-	"github.com/aoyako/swolf/connector"
-	_ "github.com/lib/pq"
+	"github.com/noyako/swolf/connector"
 )
 
+// Dealer controls databases manipulation.
 type Dealer struct {
-	masterController masterController
-	tenantController tenantController
+	masterController MasterController
+	tenantController TenantController
 }
 
+// Setup creates Dealer by config.
 func Setup(cfg Config) *Dealer {
 	global, err := sql.Open(cfg.Driver, cfg.Connection)
 	if err != nil {
@@ -36,6 +37,7 @@ func Setup(cfg Config) *Dealer {
 	return &dealer
 }
 
+// Create creates new tenant with specified id.
 func (d *Dealer) Create(id string) (*sql.DB, error) {
 	name, err := d.masterController.Create(id)
 	if err != nil {
@@ -44,6 +46,7 @@ func (d *Dealer) Create(id string) (*sql.DB, error) {
 	return d.tenantController.Create(name)
 }
 
+// Get returns tenant with specified id.
 func (d *Dealer) Get(id string) (*sql.DB, error) {
 	name, err := d.masterController.Get(id)
 	if err != nil {
@@ -52,6 +55,7 @@ func (d *Dealer) Get(id string) (*sql.DB, error) {
 	return d.tenantController.Get(name)
 }
 
+// Delete deletes tenant with specified id.
 func (d *Dealer) Delete(id string) error {
 	name, err := d.masterController.Delete(id)
 	if err != nil {

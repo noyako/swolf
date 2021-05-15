@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/aoyako/swolf/builder"
+	"github.com/noyako/swolf/builder"
 )
 
 type masterDB struct {
@@ -27,6 +27,7 @@ func newMasterDB(db *sql.DB, table, key, tenant string, mapper FMapper) *masterD
 	}
 }
 
+// Get returns database name for tenant.
 func (m *masterDB) Get(id string) (string, error) {
 	t, err := m.db.Begin()
 	if err != nil {
@@ -62,9 +63,10 @@ func (m *masterDB) Get(id string) (string, error) {
 		return "", err
 	}
 
-	return "", fmt.Errorf("Tenant for id=%s (key=%s) not found", id, key)
+	return "", fmt.Errorf(errorTenantNotFound, id, key)
 }
 
+// Create creates database name for tenant.
 func (m *masterDB) Create(id string) (string, error) {
 	err := m.db.Ping()
 	if err != nil {
@@ -98,12 +100,13 @@ func (m *masterDB) Create(id string) (string, error) {
 		return "", err
 	}
 	if rowCnt == 0 {
-		return "", fmt.Errorf("Could not insert for id=%s (key=%s, value=%s)", id, key, value)
+		return "", fmt.Errorf(errorCannotInsert, id, key, value)
 	}
 
 	return m.mapper.FieldToDatabase(value), nil
 }
 
+// Delete deletes database name for tenant.
 func (m *masterDB) Delete(id string) (string, error) {
 	t, err := m.db.Begin()
 	if err != nil {
@@ -134,7 +137,7 @@ func (m *masterDB) Delete(id string) (string, error) {
 		return "", err
 	}
 	if rowCnt == 0 {
-		return "", fmt.Errorf("Could not delete for id=%s (key=%s)", id, key)
+		return "", fmt.Errorf(errorCannotDelete, id, key)
 	}
 
 	return value, nil

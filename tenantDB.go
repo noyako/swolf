@@ -3,8 +3,8 @@ package swolf
 import (
 	"database/sql"
 
-	"github.com/aoyako/swolf/builder"
-	"github.com/aoyako/swolf/connector"
+	"github.com/noyako/swolf/builder"
+	"github.com/noyako/swolf/connector"
 )
 
 type tenantDB struct {
@@ -23,11 +23,13 @@ func newTenantDB(db *sql.DB, connection, drv, tmpl string) *tenantDB {
 	}
 }
 
+// Get connects to database and returns connection.
 func (t *tenantDB) Get(name string) (*sql.DB, error) {
 	conn, err := connector.Connect(t.driver, t.connection, name)
 	return conn, err
 }
 
+// Create creates database and returns connection.
 func (t *tenantDB) Create(name string) (*sql.DB, error) {
 	req := builder.NewBuilder().Create(name).Build()
 	_, err := t.db.Exec(req)
@@ -38,6 +40,7 @@ func (t *tenantDB) Create(name string) (*sql.DB, error) {
 	return connector.Connect(t.driver, t.connection, name)
 }
 
+// Delete deletes database.
 func (t *tenantDB) Delete(name string) error {
 	req := builder.NewBuilder().Drop(name).Build()
 	_, err := t.db.Exec(req)
