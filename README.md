@@ -10,7 +10,7 @@ Swolf is a library for managing databases in database-per-tenant architecture.
 
 # Contributing
 1. Fork it
-2. Clone develop: `git clone -b develop https://github.com/aoyako/swolf`
+2. Clone develop: `git clone -b develop https://github.com/noyako/swolf`
 3. Create your feature branch: `git checkout -b some-feature`
 4. Make changes and add them: `git add .`
 5. Commit: `git commit -m "(feat/fix/change)[what]: Add some feature"`
