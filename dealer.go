@@ -17,11 +17,6 @@ type Dealer struct {
 
 // Setup creates Dealer by config.
 func Setup(cfg Config) *Dealer {
-	global, err := sql.Open(cfg.Driver, cfg.Connection)
-	if err != nil {
-		panic("Cannot open sql environment")
-	}
-
 	master, err := connector.Connect(cfg.Driver, cfg.Connection, cfg.MasterDatabase)
 	if err != nil {
 		panic("Cannot open master database")
@@ -35,7 +30,7 @@ func Setup(cfg Config) *Dealer {
 		cfg.MasterData.getTenant(),
 		cfg.Mapper)
 
-	dealer.tenantController = newTenantDB(global, cfg.Connection, cfg.Driver, cfg.Template)
+	dealer.tenantController = newTenantDB(master, cfg.Connection, cfg.Driver, cfg.Template)
 
 	dealer.pool = newDatabasePool(defaultConnectionsNumber)
 
