@@ -17,9 +17,10 @@ type tenantDB struct {
 func newTenantDB(db *sql.DB, connection, drv, tmpl string) *tenantDB {
 
 	return &tenantDB{
-		db:       db,
-		template: tmpl,
-		driver:   drv,
+		db:         db,
+		template:   tmpl,
+		driver:     drv,
+		connection: connection,
 	}
 }
 

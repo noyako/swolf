@@ -14,7 +14,7 @@ type Pool interface {
 }
 
 type databasePool struct {
-	mutex   *sync.Mutex
+	mutex   sync.RWMutex
 	conns   map[string]*sql.DB
 	timing  map[string]uint64
 	maxConn int
@@ -22,7 +22,6 @@ type databasePool struct {
 
 func newDatabasePool(cons int) *databasePool {
 	return &databasePool{
-		mutex:   &sync.Mutex{},
 		conns:   make(map[string]*sql.DB),
 		timing:  make(map[string]uint64),
 		maxConn: cons,
@@ -30,8 +29,8 @@ func newDatabasePool(cons int) *databasePool {
 }
 
 func (p *databasePool) Get(id string) (*sql.DB, bool) {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+	p.mutex.RLock()
+	defer p.mutex.RUnlock()
 
 	db, ok := p.conns[id]
 	return db, ok
@@ -41,7 +40,7 @@ func (p *databasePool) Put(id string, db *sql.DB) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	if _, ok := p.Get(id); ok || (len(p.conns) < p.maxConn) {
+	if _, ok := p.conns[id]; ok || (len(p.conns) < p.maxConn) {
 		p.conns[id] = db
 		p.timing[id] = uint64(time.Now().UnixNano())
 		return
