@@ -6,10 +6,13 @@ import (
 	"github.com/noyako/swolf/connector"
 )
 
+const defaultConnectionsNumber = 10
+
 // Dealer controls databases manipulation.
 type Dealer struct {
 	masterController MasterController
 	tenantController TenantController
+	pool             Pool
 }
 
 // Setup creates Dealer by config.
@@ -34,6 +37,8 @@ func Setup(cfg Config) *Dealer {
 
 	dealer.tenantController = newTenantDB(global, cfg.Connection, cfg.Driver, cfg.Template)
 
+	dealer.pool = newDatabasePool(defaultConnectionsNumber)
+
 	return &dealer
 }
 
@@ -48,11 +53,22 @@ func (d *Dealer) Create(id string) (*sql.DB, error) {
 
 // Get returns tenant with specified id.
 func (d *Dealer) Get(id string) (*sql.DB, error) {
+	if db, ok := d.pool.Get(id); ok {
+		return db, nil
+	}
+
 	name, err := d.masterController.Get(id)
 	if err != nil {
 		return nil, err
 	}
-	return d.tenantController.Get(name)
+
+	db, err := d.tenantController.Get(name)
+	if err != nil {
+		return nil, err
+	}
+
+	d.pool.Put(id, db)
+	return db, nil
 }
 
 // Delete deletes tenant with specified id.

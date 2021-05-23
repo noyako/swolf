@@ -1,3 +1,3 @@
 #!/bin/sh
 
-mockgen -destination=mock/controller.go github.com/noyako/swolf  MasterController,TenantController
+mockgen -destination=mock_swolf/controller.go github.com/noyako/swolf  MasterController,TenantController,Pool
